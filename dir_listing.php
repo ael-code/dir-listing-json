@@ -42,7 +42,7 @@ $cfg= new ConfigProvider();
 	$dir_handle = opendir($full_path);
 	
 	//error opening folder
-	if($dir_handle == false) errorResponse("Error! failed to open folder", 500);
+	if($dir_handle == false) errorResponse("Failed to open folder", 500);
 	
 	$folderlist = array();
 	$filelist = array();
@@ -76,6 +76,13 @@ $cfg= new ConfigProvider();
 				$folderlist[ $name ]['size'] = get_file_size($full_path.$name);			
 			else
 				$folderlist[ $name ]['size'] = null;
+			
+			if($cfg->getCfg("show_modified_time") === true)
+				$folderlist[ $name ]['mtime'] = filectime($full_path.$name);
+			
+			$folderlist[ $name ]['perms'] = fileperms($full_path.$name);
+			
+			
 		}
 	
 		//print file
@@ -83,10 +90,11 @@ $cfg= new ConfigProvider();
 			$filelist[ $name ]['name'] = $name;
 			$filelist[ $name ]['url'] = rawurlencode($path . $name);
 			$filelist[ $name ]['size'] = get_file_size($full_path.$name);
+			
 			if($cfg->getCfg("show_modified_time") === true)
 				$filelist[ $name ]['mtime'] = filectime($full_path.$name);
-			else
-				$filelist[ $name ]['mtime'] = null;
+				
+			$filelist[ $name ]['perms'] = fileperms($full_path.$name);
 		}
 		
 		$response = array(
